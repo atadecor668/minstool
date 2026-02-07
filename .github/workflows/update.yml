@@ -34,17 +34,25 @@ jobs:
             echo "Description: Kho tweak cho RootHide"
           } > Release
 
-      - name: Commit and push changes
+      - name: Generate Packages & Release
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # Xóa file cũ
+          rm -f Packages Packages.bz2 Release
           
-          # Lưu tạm các file đã tạo để tránh lỗi "uncommitted changes"
-          git add Packages Packages.bz2 Release
+          # Quét file với đường dẫn tường minh
+          dpkg-scanpackages ./debs /dev/null > Packages
           
-          # Kéo dữ liệu mới nhất về và ép buộc gộp
-          git pull origin main --rebase
+          # Nén file
+          bzip2 -fk Packages
           
-          # Đẩy lên bằng mọi giá
-          git commit -m "Update repo index" || exit 0
-          git push origin main --force
+          # Tạo lại Release
+          {
+            echo "Origin: Minstool Repo"
+            echo "Label: Minstool"
+            echo "Suite: stable"
+            echo "Version: 1.0"
+            echo "Codename: ios"
+            echo "Architectures: iphoneos-arm64 iphoneos-arm64e"
+            echo "Components: main"
+            echo "Description: Kho tweak cho RootHide"
+          } > Release
