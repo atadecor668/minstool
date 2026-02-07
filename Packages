@@ -1,0 +1,16 @@
+Package: com.mins.mutil
+Version: 0.0.1-159+debug
+Architecture: iphoneos-arm64e
+Maintainer: Mins
+Installed-Size: 68948
+Filename: ./debs/com.mins.mutil.deb
+Size: 22275774
+MD5sum: 97b2fb2f0a4b584b37198487490546d4
+SHA1: 5d3fdff146068ee417bf41254345559675a6e3cf
+SHA256: 0de75f641a4df6dc6dae9df610e2b84a31bc17fb7e3c1a913fbf5ef1d10be61e
+Section: Tweak
+Description: An awesome tool of some sort!!
+Tag: role::hacker
+Author: Mins
+Name: Mins Utilities for AutoTouch
+
