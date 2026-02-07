@@ -46,13 +46,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Đưa các file mới tạo vào hàng chờ (để tránh lỗi 128)
+          # 1. Thêm các file mới tạo vào danh sách chờ ngay lập tức
           git add Packages Packages.bz2 Release
           
-          # 2. Kéo dữ liệu mới nhất về và tự động gộp (rebase)
-          # Nếu có xung đột, nó sẽ ưu tiên giữ lại các file bot vừa tạo
+          # 2. Lưu lại các thay đổi này vào bộ nhớ tạm
+          git commit -m "Update repo index" || exit 0
+          
+          # 3. Kéo dữ liệu mới nhất và gộp, ưu tiên file vừa tạo (ours)
           git pull origin main --rebase -X ours
           
-          # 3. Commit và đẩy lên
-          git commit -m "Update repo index" || exit 0
+          # 4. Đẩy lên GitHub
           git push origin main --force
