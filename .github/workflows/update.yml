@@ -1,0 +1,43 @@
+name: Update Sileo Repo
+on:
+  push:
+    paths:
+      - 'debs/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        run: sudo apt-get install -y dpkg-dev bzip2
+
+      - name: Generate Packages & Release
+        run: |
+          # Xóa file cũ nếu có để tránh lỗi
+          rm -f Packages Packages.bz2 Release
+          
+          # Quét file deb
+          dpkg-scanpackages -m ./debs > Packages
+          bzip2 -fk Packages
+          
+          # Tạo file Release cho Sileo
+          echo "Origin: Minstool Repo" > Release
+          echo "Label: Minstool" >> Release
+          echo "Suite: stable" >> Release
+          echo "Version: 1.0" >> Release
+          echo "Codename: ios" >> Release
+          echo "Architectures: iphoneos-arm64" >> Release
+          echo "Components: main" >> Release
+          echo "Description: Kho tweak cho RootHide" >> Release
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add Packages Packages.bz2 Release
+          git commit -m "Update repo index" || exit 0
+          git push
