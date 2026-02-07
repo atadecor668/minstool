@@ -1,4 +1,5 @@
 name: Update Sileo Repo
+
 on:
   push:
     paths:
@@ -8,23 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Dòng quan trọng nhất để sửa lỗi 403:
+    permissions:
+      contents: write
+      
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup environment
-        run: sudo apt-get install -y dpkg-dev bzip2
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2
 
       - name: Generate Packages & Release
         run: |
-          # Xóa file cũ nếu có để tránh lỗi
           rm -f Packages Packages.bz2 Release
-          
-          # Quét file deb
           dpkg-scanpackages -m ./debs > Packages
           bzip2 -fk Packages
-          
-          # Tạo file Release cho Sileo
           echo "Origin: Minstool Repo" > Release
           echo "Label: Minstool" >> Release
           echo "Suite: stable" >> Release
@@ -36,8 +36,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add Packages Packages.bz2 Release
           git commit -m "Update repo index" || exit 0
           git push
