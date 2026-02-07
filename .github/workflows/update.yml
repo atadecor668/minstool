@@ -16,40 +16,20 @@ jobs:
           fetch-depth: 0
 
       - name: Setup environment
-        run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2 zstd
 
       - name: Generate Packages & Release
         run: |
           rm -f Packages Packages.bz2 Release
-          dpkg-scanpackages -m ./debs > Packages
-          bzip2 -fk Packages
-          {
-            echo "Origin: Minstool Repo"
-            echo "Label: Minstool"
-            echo "Suite: stable"
-            echo "Version: 1.0"
-            echo "Codename: ios"
-            echo "Architectures: iphoneos-arm64"
-            echo "Components: main"
-            echo "Description: Kho tweak cho RootHide"
-          } > Release
-
-      - name: Generate Packages & Release
-        run: |
-          # Xóa sạch dấu vết cũ
-          rm -f Packages Packages.bz2 Release
-          
-          # Quét cưỡng ép: Nếu không ra file, lệnh này sẽ báo lỗi ngay để ta biết
+          # Quét file deb, hỗ trợ cả định dạng nén zstd mới
           dpkg-scanpackages -m ./debs /dev/null > Packages
           
-          # Kiểm tra xem file Packages có nội dung không
           if [ ! -s Packages ]; then
-            echo "LỖI: File Packages vẫn trống rỗng! Kiểm tra lại định dạng file deb."
+            echo "LỖI: File Packages trống rỗng! Kiểm tra lại file .deb."
             exit 1
           fi
           
           bzip2 -fk Packages
-          
           {
             echo "Origin: Minstool Repo"
             echo "Label: Minstool"
@@ -60,3 +40,13 @@ jobs:
             echo "Components: main"
             echo "Description: Kho tweak cho RootHide"
           } > Release
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add Packages Packages.bz2 Release
+          # Kéo dữ liệu mới nhất về để tránh lỗi rejected
+          git pull origin main --rebase
+          git commit -m "Update repo index" || exit 0
+          git push origin main --force
