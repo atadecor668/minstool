@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Lấy toàn bộ lịch sử để tránh lỗi "fetch first"
 
       - name: Setup environment
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2
@@ -41,7 +39,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main # Lấy dữ liệu mới nhất về trước khi đẩy lên
           git add Packages Packages.bz2 Release
           git commit -m "Update repo index" || exit 0
-          git push origin main
+          # Dùng -f để ép buộc ghi đè, xóa bỏ lỗi [rejected]
+          git push origin main -f
