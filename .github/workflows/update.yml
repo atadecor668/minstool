@@ -46,14 +46,17 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Thêm các file mới tạo vào danh sách chờ ngay lập tức
+          # 1. Tạm cất các file Packages/Release vào ngăn kéo
           git add Packages Packages.bz2 Release
+          git stash
           
-          # 2. Lưu lại các thay đổi này vào bộ nhớ tạm
+          # 2. Cập nhật mã nguồn mới nhất từ GitHub
+          git pull origin main --rebase
+          
+          # 3. Lấy lại các file từ ngăn kéo ra và đè lên bản cũ
+          git stash pop || echo "No changes to pop"
+          
+          # 4. Commit và đẩy lên bằng mọi giá
+          git add Packages Packages.bz2 Release
           git commit -m "Update repo index" || exit 0
-          
-          # 3. Kéo dữ liệu mới nhất và gộp, ưu tiên file vừa tạo (ours)
-          git pull origin main --rebase -X ours
-          
-          # 4. Đẩy lên GitHub
           git push origin main --force
