@@ -1,0 +1,8 @@
+Origin: Minstool Repo
+Label: Minstool
+Suite: stable
+Version: 1.0
+Codename: ios
+Architectures: iphoneos-arm64
+Components: main
+Description: Kho tweak cho RootHide
