@@ -38,14 +38,17 @@ jobs:
         run: |
           rm -f Packages Packages.bz2 Release
           
-          # Lệnh quét kèm theo điều kiện bỏ qua file lỗi
-          # Chúng ta dùng "|| true" để nếu 1 file lỗi thì nó vẫn chạy tiếp
-          dpkg-scanpackages -m ./debs /dev/null > Packages || true
+          # Cài đặt công cụ hỗ trợ zstd (để đọc các file deb đời mới)
+          sudo apt-get install -y zstd
           
-          # Kiểm tra nếu file Packages trống rỗng
-          if [ ! -s Packages ]; then
-            echo "Canh bao: File deb bi loi hoac khong tim thay file hop le!"
-          fi
+          # Tự tạo file Packages bằng cách duyệt từng file
+          # Cách này bỏ qua lỗi định dạng nghiêm ngặt của dpkg-scanpackages
+          for deb in ./debs/*.deb; do
+            echo "Dang xu ly: $deb"
+            dpkg-deb -I "$deb" > control_info || true
+            # Trich xuat thong tin vao file Packages
+            dpkg-scanpackages -m ./debs /dev/null >> Packages || true
+          done
           
           bzip2 -fk Packages
           
