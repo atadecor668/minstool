@@ -38,8 +38,13 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Lưu tạm các file đã tạo để tránh lỗi "uncommitted changes"
           git add Packages Packages.bz2 Release
-          # Lấy dữ liệu mới nhất về và ưu tiên dữ liệu của Bot
-          git pull origin main --rebase -X ours
+          
+          # Kéo dữ liệu mới nhất về và ép buộc gộp
+          git pull origin main --rebase
+          
+          # Đẩy lên bằng mọi giá
           git commit -m "Update repo index" || exit 0
           git push origin main --force
